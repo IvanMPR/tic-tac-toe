@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Foundation:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Tic-Tac-Toe</title>
+  </head>
+  <body>
+    <div class="main-wrapper">
+      <div class="game-title">
+        <h1>Tic-Tac-Toe</h1>
+      </div>
+      <div class="wrapper">
+        <div class="div1 game-field" id="1"></div>
+        <div class="div2 game-field" id="2"></div>
+        <div class="div3 game-field" id="3"></div>
+        <div class="div4 game-field" id="4"></div>
+        <div class="div5 game-field" id="5"></div>
+        <div class="div6 game-field" id="6"></div>
+        <div class="div7 game-field" id="7"></div>
+        <div class="div8 game-field" id="8"></div>
+        <div class="div9 game-field" id="9"></div>
+        <div class="div10 player player-left" id="left">Player 1</div>
+        <div class="div11 player-turn">&leftarrow;</div>
+        <div class="div12 player player-right" id="right">Player 2</div>
+        <div class="div13 score">
+          current score: <span class="score-span score-left-span">0</span>
+        </div>
+        <div class="div14 score">
+          current score: <span class="score-span score-right-span">0</span>
+        </div>
+        <div class="div15 info">
+          Press start game button and enter your username...
+        </div>
+        <div class="div16 user-interface">
+          <div class="button-div">
+            <button class="btn start-btn">Start Game</button>
+          </div>
+          <div class="button-div restart-button-div inactive">
+            <button class="btn restart-btn">Restart Game</button>
+          </div>
+          <div class="input-div inactive">
+            <input
+              class="name-input"
+              type="text"
+              placeholder="Enter your username..."
+            />
+            <button class="btn name-btn">Enter Username</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="socket.io/socket.io.js"></script>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
