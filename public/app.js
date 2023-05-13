@@ -1,7 +1,7 @@
 export const socket = io();
 
 // prettier-ignore
-import { startButton, onStartGame, usernameButton, resetLastPlayedPiece, updateScore, gameBoard, boardContainer, playersClient, drawMove, enterUsername, markActivePlayer,parseActivePlayerName, game, clearActivePlayer, startGame, endGame, renderPlayerNames , renderInfoMessage, playerLeftGame, isGameOver, flipDirectionArrow,paintWinnersPieces} from "./client-side-modules/utils-client.js";
+import { startButton, onStartGame, usernameButton, resetLastPlayedPiece, gameBoard, boardContainer, playersClient, drawMove, enterUsername, markActivePlayer,parseActivePlayerName, game, clearActivePlayer, startGame, endGame, renderPlayerNames , renderInfoMessage, playerLeftGame, isGameOver, flipDirectionArrow, paintWinnersPieces, gameWinnerSound, activateRestartButton, restartButton, restartGame, resetBoard} from "./client-side-modules/utils-client.js";
 
 // -------- SOCKETS HANDLING ----------- //
 socket.on('new player connected', playersServer => {
@@ -38,12 +38,19 @@ socket.on('new move', data => {
 
 socket.on('game over', data => {
   console.log(data, 'from game over...');
-  updateScore(data.playersServer);
+  // renderScore();
   endGame();
-  paintWinnersPieces(data.winner.paintIndexesArray, gameBoard);
+  paintWinnersPieces(data.winner.winningIndexesArray, gameBoard);
   clearActivePlayer();
-  renderInfoMessage(`${data.winner.username} has won this match !`);
+  renderInfoMessage(`${data.winner.winnersName} has won this match !`);
+  gameWinnerSound();
+  activateRestartButton();
   console.log('from players client', playersClient);
+});
+
+socket.on('clear board', () => {
+  resetBoard();
+  renderScore(playersClient);
 });
 
 socket.on('player left game', data => {
@@ -56,6 +63,7 @@ socket.on('no room', () =>
 
 // -------- EVENT LISTENERS ----------- //
 startButton.addEventListener('click', onStartGame);
+restartButton.addEventListener('click', restartGame);
 usernameButton.addEventListener('click', enterUsername);
 boardContainer.addEventListener('click', e => {
   game(e);

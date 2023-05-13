@@ -7,16 +7,18 @@ export const usernameInput = document.querySelector('.name-input');
 export const usernameButton = document.querySelector('.name-btn');
 export const boardContainer = document.querySelector('.wrapper');
 export const playersClient = [];
-export let isGameOver = true;
 export const gameBoard = document.querySelectorAll('.game-field');
+export let isGameOver = true;
 let lastPlacedPiece;
 const playersNames = document.querySelectorAll('.player');
 const infoDiv = document.querySelector('.info');
 const playerTurnArrow = document.querySelector('.player-turn');
 const scoreSpans = document.querySelectorAll('.score-span');
+
 export function resetLastPlayedPiece() {
   lastPlacedPiece = undefined;
 }
+
 export function onStartGame() {
   usernameWrapperDiv.classList.toggle('inactive');
   this.classList.toggle('inactive');
@@ -79,6 +81,7 @@ export function parseActivePlayerName() {
   const activePlayerName = document.querySelector('.active-player');
   return activePlayerName.textContent;
 }
+
 export function flipDirectionArrow() {
   const leftOrRight = document
     .getElementById('left')
@@ -95,12 +98,21 @@ function placeGamePieceSound() {
   return placePieceSound.play();
 }
 
-function gameWinnerSound() {
+export function gameWinnerSound() {
   const winSound = new Audio('../sounds/game_win.wav');
   return winSound.play();
 }
 // ------------------------------------------------- //
-
+function gameOverWithDraw() {
+  isGameOver = true;
+  renderInfoMessage('Draw!');
+  restartButton.classList.remove('inactive');
+  restartButton.classList.add('active');
+  // restartButton.textContent = 'Restart';
+  playersNames.forEach(playerName =>
+    playerName.classList.remove('active-player')
+  );
+}
 export function getActivePlayerNum() {
   const currentActive = document
     .getElementById('left')
@@ -114,6 +126,7 @@ export function drawMove(data) {
   const targetField = document.getElementById(data.targetField);
   targetField.textContent = data.gamePiece;
 }
+
 export function game(e) {
   if (isGameOver) return;
   if (!e.target.classList.contains('game-field')) return;
@@ -153,17 +166,26 @@ export function game(e) {
   checkWinner();
 }
 // helper function for updating the score
-export const updateScore = playersArray =>
-  // console.log(playersClient, 'from updateScore...');
-  playersArray.forEach(
-    (player, i) => (scoreSpans[i].textContent = player.score)
-  );
+// export const updateScore = winnerPiece => {
+//   const [player] = playersClient.filter(
+//     player => player.gamePiece === winnerPiece
+//   );
+//   player.score += 1;
+//   console.log(player, 'from updateScore...');
+// };
+// helper function for rendering the score
+// export const renderScore = playersArray =>
+// console.log(playersClient, 'from renderScore...');
+// playersArray.forEach(
+//   (player, i) => (scoreSpans[i].textContent = player.score)
+// );
 
 // helper functions for manipulating state variable from app.js
 export const startGame = () => (isGameOver = false);
 export const endGame = () => (isGameOver = true);
 // helper fn for emitting winner data
-const sendWinnerData = (gamePiece, eventToEmit, winnerIndexesArray) => {
+
+const sendWinnerData = (gamePiece, winnerIndexesArray) => {
   const index = playersClient.findIndex(
     player => player.gamePiece === gamePiece
   );
@@ -173,15 +195,16 @@ const sendWinnerData = (gamePiece, eventToEmit, winnerIndexesArray) => {
     // change state variable
     // isGameOver = true;
 
-    gameWinnerSound();
+    // gameWinnerSound();
 
     // socket.emit(eventToEmit, gamePiece, playersClient[index]);
 
-    activateRestartButton();
+    // activateRestartButton();
   }
 };
 // helper function for activating restart button
-const activateRestartButton = () => restartButton.classList.remove('inactive');
+export const activateRestartButton = () =>
+  restartButton.classList.remove('inactive');
 
 // helper function that checks for winner after every move in checkWinner function
 const test = (gamePiece, movesArray, winningIndexesArray) =>
@@ -211,19 +234,26 @@ function checkWinner() {
 
   for (let i = 0; i < winningIndexes.length; i++) {
     if (test('X', playedMoves, winningIndexes[i])) {
-      // socket.emit('winner', {gamePiece: 'X', })
-      sendWinnerData('winner', 'X', winningIndexes[i]);
-      renderInfoMessage(`${parseActivePlayerName()} is the winner!`);
-      paintWinnersPieces(winningIndexes[i], fields);
+      socket.emit('winner', {
+        gamePiece: 'X',
+        winningIndexesArray: winningIndexes[i],
+        winnersName: parseActivePlayerName(),
+      });
+      // sendWinnerData('winner', 'X', winningIndexes[i]);
+      // updateScore('X');
       console.log('winner X');
       isGameOver = true;
       break;
     }
 
     if (test('O', playedMoves, winningIndexes[i])) {
-      sendWinnerData('winner', 'O', winningIndexes[i]);
-      renderInfoMessage(`${parseActivePlayerName()} is the winner!`);
-      paintWinnersPieces(winningIndexes[i], fields);
+      socket.emit('winner', {
+        gamePiece: 'O',
+        winningIndexesArray: winningIndexes[i],
+        winnersName: parseActivePlayerName(),
+      });
+      // sendWinnerData('winner', 'O', winningIndexes[i]);
+      // updateScore('O');
       console.log('winner O');
       isGameOver = true;
       break;
@@ -235,8 +265,31 @@ function checkWinner() {
       isGameOver = true;
       socket.emit('draw');
       console.log('DRAW');
+      break;
     }
 
     console.log('next round');
   }
+}
+export function resetBoard() {
+  // clear game board
+  clearGameBoard();
+  // reset last played gamePiece
+  resetLastPlayedPiece();
+  // update score
+  // setTimeout(() => {
+  //   renderScore(playersClient);
+  // }, 300);
+  // reset active player
+  clearActivePlayer();
+  // set isGameOver to false
+  startGame();
+  // deactivate restart button
+  restartButton.classList.add('inactive');
+  // reset game board font color to black
+  gameBoard.forEach(field => (field.style.color = 'black'));
+}
+export function restartGame() {
+  // send restart event to server
+  socket.emit('restart game');
 }

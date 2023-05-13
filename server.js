@@ -64,6 +64,16 @@ io.on('connection', socket => {
     io.emit('game over', { winner, playersServer });
   });
 
+  socket.on('restart game', () => {
+    io.emit('clear board');
+    io.emit('both players connected');
+
+    setTimeout(() => {
+      activePlayer = Math.floor(Math.random() * 2);
+      io.emit('active player', activePlayer);
+      lastConnectedPlayer = activePlayer;
+    }, 1500);
+  });
   // ------------------- IF PLAYER LEAVES DURING THE GAME --------------------- //
   socket.on('disconnect', () => {
     // disconnected player id
