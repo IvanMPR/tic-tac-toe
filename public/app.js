@@ -36,6 +36,12 @@ socket.on('new move', data => {
   resetLastPlayedPiece();
 });
 
+socket.on('draw game', () => {
+  renderInfoMessage('Draw game !');
+  clearActivePlayer();
+  activateRestartButton();
+});
+
 socket.on('game over', data => {
   console.log(data, 'from game over...');
   // renderScore();
@@ -50,7 +56,7 @@ socket.on('game over', data => {
 
 socket.on('clear board', () => {
   resetBoard();
-  renderScore(playersClient);
+  // renderScore(playersClient);
 });
 
 socket.on('player left game', data => {

@@ -234,34 +234,43 @@ function checkWinner() {
 
   for (let i = 0; i < winningIndexes.length; i++) {
     if (test('X', playedMoves, winningIndexes[i])) {
+      console.log(test('X', playedMoves, winningIndexes[i]));
       socket.emit('winner', {
         gamePiece: 'X',
         winningIndexesArray: winningIndexes[i],
         winnersName: parseActivePlayerName(),
       });
-      // sendWinnerData('winner', 'X', winningIndexes[i]);
-      // updateScore('X');
+
       console.log('winner X');
       isGameOver = true;
       break;
     }
 
     if (test('O', playedMoves, winningIndexes[i])) {
+      console.log(test('O', playedMoves, winningIndexes[i]));
       socket.emit('winner', {
         gamePiece: 'O',
         winningIndexesArray: winningIndexes[i],
         winnersName: parseActivePlayerName(),
       });
-      // sendWinnerData('winner', 'O', winningIndexes[i]);
-      // updateScore('O');
+
       console.log('winner O');
       isGameOver = true;
       break;
     }
 
-    if (fields.every(div => div.textContent !== '') && !isGameOver) {
-      gameOverWithDraw();
-      clearActivePlayer();
+    if (
+      (!test('X', playedMoves, winningIndexes[i]) ||
+        !test('O', playedMoves, winningIndexes[i])) &&
+      fields.every(div => div.textContent !== '')
+    ) {
+      console.log(
+        test('X', playedMoves, winningIndexes[i]),
+        test('O', playedMoves, winningIndexes[i]),
+        'from checkWinner'
+      );
+      // gameOverWithDraw();
+      // clearActivePlayer();
       isGameOver = true;
       socket.emit('draw');
       console.log('DRAW');

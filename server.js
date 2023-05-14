@@ -74,6 +74,10 @@ io.on('connection', socket => {
       lastConnectedPlayer = activePlayer;
     }, 1500);
   });
+
+  socket.on('draw', () => {
+    io.emit('draw game');
+  });
   // ------------------- IF PLAYER LEAVES DURING THE GAME --------------------- //
   socket.on('disconnect', () => {
     // disconnected player id
