@@ -37,14 +37,15 @@ socket.on('new move', data => {
 });
 
 socket.on('draw game', () => {
-  renderInfoMessage('Draw game !');
+  renderInfoMessage('Draw game ! Click on the Restart button to play again...');
+  endGame();
   clearActivePlayer();
+  // q: why function on the line above is not working?
   activateRestartButton();
 });
 
 socket.on('game over', data => {
   console.log(data, 'from game over...');
-  // renderScore();
   endGame();
   paintWinnersPieces(data.winner.winningIndexesArray, gameBoard);
   clearActivePlayer();

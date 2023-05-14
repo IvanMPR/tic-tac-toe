@@ -259,25 +259,34 @@ function checkWinner() {
       break;
     }
 
-    if (
-      (!test('X', playedMoves, winningIndexes[i]) ||
-        !test('O', playedMoves, winningIndexes[i])) &&
-      fields.every(div => div.textContent !== '')
-    ) {
-      console.log(
-        test('X', playedMoves, winningIndexes[i]),
-        test('O', playedMoves, winningIndexes[i]),
-        'from checkWinner'
-      );
-      // gameOverWithDraw();
-      // clearActivePlayer();
-      isGameOver = true;
-      socket.emit('draw');
-      console.log('DRAW');
-      break;
-    }
+    // if (
+    //   (!test('X', playedMoves, winningIndexes[i]) ||
+    //     !test('O', playedMoves, winningIndexes[i])) &&
+    //   fields.every(div => div.textContent !== '')
+    // ) {
+    //   console.log(
+    //     test('X', playedMoves, winningIndexes[i]),
+    //     test('O', playedMoves, winningIndexes[i]),
+    //     'from checkWinner'
+    //   );
+    //   // gameOverWithDraw();
+    //   // clearActivePlayer();
+    //   isGameOver = true;
+    //   socket.emit('draw');
+    //   console.log('DRAW');
+    //   break;
+    // }
 
     console.log('next round');
+  }
+
+  if (!isGameOver && fields.every(div => div.textContent !== '')) {
+    // gameOverWithDraw();
+    // clearActivePlayer();
+    isGameOver = true;
+    socket.emit('draw');
+    console.log('DRAW');
+    return;
   }
 }
 export function resetBoard() {
