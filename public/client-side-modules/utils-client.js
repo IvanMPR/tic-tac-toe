@@ -13,7 +13,6 @@ let lastPlacedPiece;
 const playersNames = document.querySelectorAll('.player');
 const infoDiv = document.querySelector('.info');
 const playerTurnArrow = document.querySelector('.player-turn');
-const scoreSpans = document.querySelectorAll('.score-span');
 
 export function resetLastPlayedPiece() {
   lastPlacedPiece = undefined;
@@ -103,16 +102,7 @@ export function gameWinnerSound() {
   return winSound.play();
 }
 // ------------------------------------------------- //
-function gameOverWithDraw() {
-  isGameOver = true;
-  renderInfoMessage('Draw!');
-  restartButton.classList.remove('inactive');
-  restartButton.classList.add('active');
-  // restartButton.textContent = 'Restart';
-  playersNames.forEach(playerName =>
-    playerName.classList.remove('active-player')
-  );
-}
+
 export function getActivePlayerNum() {
   const currentActive = document
     .getElementById('left')
@@ -140,15 +130,11 @@ export function game(e) {
   const activeName = parseActivePlayerName();
   const regex = new RegExp('(' + gamePiece + ')', 'g');
   // prevent consecutive input from the same player
-  if (gamePiece === lastPlacedPiece) {
-    console.log('SAME PLAYER');
-    return;
-  }
-  // probably not necessary, prevents opposite tab wrong player input. (most likely this is possible only in development mode when two browser windows are open one to another, and player can intentionally try to click on the opposite player turn)
-  if (!regex.test(activeName)) {
-    console.log('INVALID PLAYER');
-    return;
-  }
+  if (gamePiece === lastPlacedPiece) return;
+
+  // probably not necessary, prevents opposite tab wrong player input. (most likely this is possible only in development mode when two browser windows are open one to another, and player can un/intentionally try to click on the opposite player turn)
+  if (!regex.test(activeName)) return;
+
   // draw gamePiece
   e.target.textContent = gamePiece;
   // play draw sound
@@ -165,43 +151,11 @@ export function game(e) {
 
   checkWinner();
 }
-// helper function for updating the score
-// export const updateScore = winnerPiece => {
-//   const [player] = playersClient.filter(
-//     player => player.gamePiece === winnerPiece
-//   );
-//   player.score += 1;
-//   console.log(player, 'from updateScore...');
-// };
-// helper function for rendering the score
-// export const renderScore = playersArray =>
-// console.log(playersClient, 'from renderScore...');
-// playersArray.forEach(
-//   (player, i) => (scoreSpans[i].textContent = player.score)
-// );
 
 // helper functions for manipulating state variable from app.js
 export const startGame = () => (isGameOver = false);
 export const endGame = () => (isGameOver = true);
-// helper fn for emitting winner data
 
-const sendWinnerData = (gamePiece, winnerIndexesArray) => {
-  const index = playersClient.findIndex(
-    player => player.gamePiece === gamePiece
-  );
-  if (index !== -1) {
-    playersClient[index].paintIndexesArray = winnerIndexesArray;
-    playersClient[index].score += 1;
-    // change state variable
-    // isGameOver = true;
-
-    // gameWinnerSound();
-
-    // socket.emit(eventToEmit, gamePiece, playersClient[index]);
-
-    // activateRestartButton();
-  }
-};
 // helper function for activating restart button
 export const activateRestartButton = () =>
   restartButton.classList.remove('inactive');
@@ -214,6 +168,7 @@ export const paintWinnersPieces = (winningIndexesArray, fieldsArray) =>
   winningIndexesArray.forEach(
     index => (fieldsArray[index].style.color = 'red')
   );
+
 function checkWinner() {
   const fields = Array.from(gameBoard);
   const playedMoves = fields.map(field => field.textContent);
@@ -234,58 +189,31 @@ function checkWinner() {
 
   for (let i = 0; i < winningIndexes.length; i++) {
     if (test('X', playedMoves, winningIndexes[i])) {
-      console.log(test('X', playedMoves, winningIndexes[i]));
       socket.emit('winner', {
         gamePiece: 'X',
         winningIndexesArray: winningIndexes[i],
         winnersName: parseActivePlayerName(),
       });
 
-      console.log('winner X');
       isGameOver = true;
       break;
     }
 
     if (test('O', playedMoves, winningIndexes[i])) {
-      console.log(test('O', playedMoves, winningIndexes[i]));
       socket.emit('winner', {
         gamePiece: 'O',
         winningIndexesArray: winningIndexes[i],
         winnersName: parseActivePlayerName(),
       });
 
-      console.log('winner O');
       isGameOver = true;
       break;
     }
-
-    // if (
-    //   (!test('X', playedMoves, winningIndexes[i]) ||
-    //     !test('O', playedMoves, winningIndexes[i])) &&
-    //   fields.every(div => div.textContent !== '')
-    // ) {
-    //   console.log(
-    //     test('X', playedMoves, winningIndexes[i]),
-    //     test('O', playedMoves, winningIndexes[i]),
-    //     'from checkWinner'
-    //   );
-    //   // gameOverWithDraw();
-    //   // clearActivePlayer();
-    //   isGameOver = true;
-    //   socket.emit('draw');
-    //   console.log('DRAW');
-    //   break;
-    // }
-
-    console.log('next round');
   }
 
   if (!isGameOver && fields.every(div => div.textContent !== '')) {
-    // gameOverWithDraw();
-    // clearActivePlayer();
     isGameOver = true;
     socket.emit('draw');
-    console.log('DRAW');
     return;
   }
 }
@@ -294,10 +222,6 @@ export function resetBoard() {
   clearGameBoard();
   // reset last played gamePiece
   resetLastPlayedPiece();
-  // update score
-  // setTimeout(() => {
-  //   renderScore(playersClient);
-  // }, 300);
   // reset active player
   clearActivePlayer();
   // set isGameOver to false
@@ -307,6 +231,7 @@ export function resetBoard() {
   // reset game board font color to black
   gameBoard.forEach(field => (field.style.color = 'black'));
 }
+
 export function restartGame() {
   // send restart event to server
   socket.emit('restart game');
