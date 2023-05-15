@@ -6,7 +6,7 @@ import { startButton, onStartGame, usernameButton, resetLastPlayedPiece, gameBoa
 // -------- SOCKETS HANDLING ----------- //
 socket.on('new player connected', playersServer => {
   renderPlayerNames(playersServer);
-  // keep copy of the players array from server side to client side
+  // keep the copy of the players array from server side to client side
   playersClient.length === 0
     ? playersClient.push(...playersServer)
     : playersClient.push(playersServer.pop());
@@ -23,7 +23,7 @@ socket.on('both players connected', () => {
 
 socket.on('active player', position => {
   if (isGameOver) return;
-  console.log(position, 'from active player...');
+
   clearActivePlayer();
   markActivePlayer(position);
   const currentPlayer = parseActivePlayerName();
@@ -40,24 +40,20 @@ socket.on('draw game', () => {
   renderInfoMessage('Draw game ! Click on the Restart button to play again...');
   endGame();
   clearActivePlayer();
-  // q: why function on the line above is not working?
   activateRestartButton();
 });
 
 socket.on('game over', data => {
-  console.log(data, 'from game over...');
   endGame();
   paintWinnersPieces(data.winner.winningIndexesArray, gameBoard);
   clearActivePlayer();
   renderInfoMessage(`${data.winner.winnersName} has won this match !`);
   gameWinnerSound();
   activateRestartButton();
-  console.log('from players client', playersClient);
 });
 
 socket.on('clear board', () => {
   resetBoard();
-  // renderScore(playersClient);
 });
 
 socket.on('player left game', data => {
@@ -75,5 +71,3 @@ usernameButton.addEventListener('click', enterUsername);
 boardContainer.addEventListener('click', e => {
   game(e);
 });
-// restart button listener
-// clear board and score up
