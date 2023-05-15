@@ -5,10 +5,10 @@ const path = require('path');
 const socketio = require('socket.io');
 // ---------------- custom modules  ------------------- //
 // prettier-ignore
-const { playersServer, determineGamePiece,toggleActivePlayer, randomActivePlayer, changeLastConnectedPlayerId} = require('./public/server-side-modules/utils');
+const { playersServer, determineGamePiece} = require('./public/server-side-modules/utils');
 // ----- variables ------- //
 let activePlayer;
-let lastConnectedPlayer;
+
 // -------------- INIT APP-SERVER-SOCKET  ------------------- //
 const app = express();
 const server = http.createServer(app);
@@ -41,7 +41,7 @@ io.on('connection', socket => {
     }
     if (playersServer.length === 2) {
       io.emit('both players connected');
-
+      // start game after 1.5s
       setTimeout(() => {
         activePlayer = Math.floor(Math.random() * 2);
         io.emit('active player', activePlayer);
@@ -87,7 +87,6 @@ io.on('connection', socket => {
     let playerName;
 
     if (!playersServer.some(player => player.id === id)) {
-      console.log('DENIED');
       return;
     }
     // delete disconnected player from players array
@@ -105,5 +104,5 @@ io.on('connection', socket => {
   });
 });
 // -------------- INITIALIZE SERVER ------------------- //
-const PORT = 8080;
-server.listen(PORT, () => console.log(`Listening on ${PORT}...`));
+const PORT = process.env.PORT || 3000;
+server.listen(PORT);
